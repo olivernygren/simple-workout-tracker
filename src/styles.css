@@ -323,8 +323,9 @@ select {
   min-width: 120px;
 }
 .set-row input {
-  width: 96px;
+  width: 80px;
   font-size: 16px;
+  text-align: center;
 }
 .set-row .done {
   margin-left: auto;
@@ -362,10 +363,10 @@ select {
   width: 28px;
 }
 .set-head .weight {
-  width: 96px;
+  width: 80px;
 }
 .set-head .reps {
-  width: 96px;
+  width: 80px;
 }
 .set-head .save {
   margin-left: auto;
@@ -441,27 +442,41 @@ select {
 .last-section {
   display: grid;
   gap: 6px;
-  margin-bottom: 6px;
+  margin: 16px 0;
 }
 .last-row {
   display: flex;
   align-items: center;
   gap: 8px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
 }
 .last-row .set-index {
   width: 28px;
 }
 .last-row .weight {
-  width: 96px;
+  width: 80px;
 }
 .last-row .reps {
-  width: 96px;
+  width: 80px;
 }
 .last-row .save {
   margin-left: auto;
   width: 28px;
+}
+
+.notes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #202a36;
+  padding: 8px;
+  border-radius: 6px;
+  width: 100%;
+  margin: 12px 0 0 0;
+}
+.notes p {
+  margin: 0;
 }
 
 /* Utility */

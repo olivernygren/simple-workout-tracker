@@ -32,13 +32,6 @@ export default function ProgramDetail() {
           <Link to="/">Programs</Link> <span>/</span>{" "}
           <span>{program.name}</span>
         </div>
-        <div className="row gap">
-          <Button
-            onClick={() => setPromptInfo({ wid: null, name: "", label: "" })}
-          >
-            <Plus size={16} /> New Workout
-          </Button>
-        </div>
       </div>
 
       {program.workouts.length === 0 ? (
@@ -112,6 +105,13 @@ export default function ProgramDetail() {
           })}
         </div>
       )}
+      <div className="row gap" style={{ marginTop: 16 }}>
+        <Button
+          onClick={() => setPromptInfo({ wid: null, name: "", label: "" })}
+        >
+          <Plus size={16} /> New Workout
+        </Button>
+      </div>
       <WorkoutModals
         promptInfo={promptInfo}
         setPromptInfo={setPromptInfo}

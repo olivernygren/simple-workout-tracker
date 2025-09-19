@@ -31,35 +31,35 @@ export default function Programs() {
     <div className="container">
       <div className="section-header">
         <h1>Programs</h1>
-        <div className="row gap">
-          <Button onClick={() => setPromptInfo({ pid: null, name: "" })}>
-            <Plus size={16} /> New Program
-          </Button>
-          <Button variant="ghost" onClick={() => fileInputRef.current?.click()}>
-            <Upload size={16} /> Import
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json"
-            style={{ display: "none" }}
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              try {
-                const text = await file.text();
-                importProgram(text);
-              } catch (err) {
-                console.error("Import failed:", err);
-                alert(
-                  "Failed to import file. Please select a valid JSON export."
-                );
-              } finally {
-                e.target.value = "";
-              }
-            }}
-          />
-        </div>
+      </div>
+      <div className="row gap" style={{ marginBottom: 16 }}>
+        <Button onClick={() => setPromptInfo({ pid: null, name: "" })}>
+          <Plus size={16} /> New Program
+        </Button>
+        <Button variant="ghost" onClick={() => fileInputRef.current?.click()}>
+          <Upload size={16} /> Import
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          style={{ display: "none" }}
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            try {
+              const text = await file.text();
+              importProgram(text);
+            } catch (err) {
+              console.error("Import failed:", err);
+              alert(
+                "Failed to import file. Please select a valid JSON export."
+              );
+            } finally {
+              e.target.value = "";
+            }
+          }}
+        />
       </div>
 
       {data.programs.length === 0 ? (

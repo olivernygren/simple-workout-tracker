@@ -19,6 +19,7 @@ import {
   SkipForward,
   Trash2,
   Wrench,
+  NotebookPen,
 } from "lucide-react";
 
 export default function WorkoutDetail() {
@@ -212,6 +213,22 @@ export default function WorkoutDetail() {
     return "equal";
   }
 
+  // Per-set progress icon
+  function progressForSet(ex, i) {
+    const prevSet = prev?.results?.[ex.id]?.[i];
+    const currSet = curr?.results?.[ex.id]?.[i];
+    if (!prevSet || !currSet) return null;
+    const wPrev = prevSet.weight ?? 0;
+    const wCurr = currSet.weight ?? 0;
+    const rPrev = prevSet.reps ?? 0;
+    const rCurr = currSet.reps ?? 0;
+    // Only show icon if either weight or reps matches previous set
+    if (wCurr !== wPrev && rCurr !== rPrev) return null;
+    if (wCurr > wPrev || rCurr > rPrev) return "up";
+    if (wCurr < wPrev || rCurr < rPrev) return "down";
+    return "equal";
+  }
+
   return (
     <div className="container">
       <div className="section-header">
@@ -219,11 +236,6 @@ export default function WorkoutDetail() {
           <Link to="/">Programs</Link> <span>/</span>{" "}
           <Link to={`/program/${program?.id}`}>{program?.name}</Link>{" "}
           <span>/</span> <span>{workout.name}</span>
-        </div>
-        <div className="row gap">
-          <Button onClick={() => setPromptInfo({ mode: "add" })}>
-            <Plus size={16} /> Add Exercise
-          </Button>
         </div>
       </div>
 
@@ -250,6 +262,16 @@ export default function WorkoutDetail() {
                 </Button>
                 {workoutMenuOpen && (
                   <div className="menu-panel" role="menu">
+                    <button
+                      className="menu-item"
+                      onClick={() => {
+                        setWorkoutMenuOpen(false);
+                        setPromptInfo({ mode: "add" });
+                      }}
+                    >
+                      <Plus size={14} style={{ marginRight: 6 }} />
+                      Add Exercise
+                    </button>
                     <button
                       className="menu-item"
                       onClick={() => {
@@ -284,17 +306,25 @@ export default function WorkoutDetail() {
 
         <div className="stack">
           {workout.exercises.length === 0 ? (
-            <p className="muted">No exercises yet.</p>
+            <p className="muted">No exercises yet</p>
           ) : (
             workout.exercises.map((ex) => (
               <div key={ex.id} className="card">
                 <div className="card-head">
-                  <h3>{ex.name}</h3>
+                  <h3
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {ex.name}
+                  </h3>
                   <div
                     className="head-right"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    {(() => {
+                    {/* {(() => {
                       const p = progressForExercise(ex);
                       return p === "up" ? (
                         <TrendingUp size={16} color="#9afaa0" title="Up" />
@@ -303,10 +333,10 @@ export default function WorkoutDetail() {
                       ) : p === "equal" ? (
                         <Equal size={16} color="#9aa4b2" title="Equal" />
                       ) : null;
-                    })()}
-                    <span className="muted">
-                      {ex.sets} sets • {ex.targetReps.min}-{ex.targetReps.max}
-                    </span>
+                    })()} */}
+                    {/* <span className="muted">
+                      {ex.sets} × {ex.targetReps.min}-{ex.targetReps.max}
+                    </span> */}
                     <div className="menu">
                       <Button
                         variant="icon"
@@ -340,7 +370,7 @@ export default function WorkoutDetail() {
                               size={14}
                               style={{ marginRight: 6 }}
                             />
-                            Target reps
+                            Target rep range
                           </button>
                           <button
                             className="menu-item"
@@ -416,37 +446,45 @@ export default function WorkoutDetail() {
                     </div>
                   </div>
                 </div>
+                <span className="no-margin">
+                  {ex.sets} × {ex.targetReps.min}-{ex.targetReps.max}
+                </span>
                 {ex.notes ? (
-                  <div className="card-body">
-                    <p className="muted" style={{ margin: "0 0 16px 0" }}>
-                      {ex.notes}
-                    </p>
+                  <div className="card-body notes">
+                    <NotebookPen size={16} className="muted" />
+                    <p className="muted">{ex.notes}</p>
                   </div>
                 ) : null}
-                {/* Last session for this exercise, aligned */}
                 {prev?.results?.[ex.id] ? (
                   <div className="last-section">
                     <div className="last-row">
-                      <div className="set-index">
-                        Last ({relDaysAgo(prev.dateISO)})
+                      <div
+                        className="set-index"
+                        style={{ whiteSpace: "nowrap" }}
+                      >
+                        Last workout ({relDaysAgo(prev.dateISO)})
                       </div>
                     </div>
                     {values[ex.id].map((_, i) => (
                       <div className="last-row" key={`last-${ex.id}-${i}`}>
                         <div className="set-index">{i + 1}</div>
                         <div className="weight">
-                          {prev?.results[ex.id]?.[i]?.weight ?? "-"}
+                          {prev?.results[ex.id]?.[i]?.weight != null &&
+                          prev?.results[ex.id]?.[i]?.weight !== "-"
+                            ? `${prev.results[ex.id][i].weight} kg`
+                            : "-"}
                         </div>
                         <div className="reps">
-                          {prev?.results[ex.id]?.[i]?.reps ?? "-"}
+                          {prev?.results[ex.id]?.[i]?.reps != null &&
+                          prev?.results[ex.id]?.[i]?.reps !== "-"
+                            ? `${prev.results[ex.id][i].reps} reps`
+                            : "-"}
                         </div>
                         <div className="save" />
                       </div>
                     ))}
                   </div>
                 ) : null}
-
-                {/* Set table header */}
                 <div className="set-head">
                   {editSets[ex.id] && !isCompleted ? (
                     <div className="remove" />
@@ -456,7 +494,6 @@ export default function WorkoutDetail() {
                   <div className="reps">Reps</div>
                   <div className="save">Save</div>
                 </div>
-
                 <div className="stack">
                   {values[ex.id].map((_, i) => (
                     <div key={i} className="set-row">
@@ -510,6 +547,36 @@ export default function WorkoutDetail() {
                           })
                         }
                       />
+                      {/* Progress icon for this set */}
+                      {(() => {
+                        const p = progressForSet(ex, i);
+                        return p === "up" ? (
+                          <TrendingUp
+                            size={18}
+                            color="#9afaa0"
+                            title="Up"
+                            style={{ marginLeft: 4, marginRight: 4 }}
+                          />
+                        ) : p === "down" ? (
+                          <TrendingDown
+                            size={18}
+                            color="#ff6b6b"
+                            title="Down"
+                            style={{ marginLeft: 4, marginRight: 4 }}
+                          />
+                        ) : p === "equal" ? (
+                          <Equal
+                            size={18}
+                            color="#9aa4b2"
+                            title="Equal"
+                            style={{ marginLeft: 4, marginRight: 4 }}
+                          />
+                        ) : (
+                          <span
+                            style={{ width: 18, display: "inline-block" }}
+                          />
+                        );
+                      })()}
                       <label
                         className={`check-toggle ${
                           doneMap[`${ex.id}-${i}`] ? "checked" : ""
